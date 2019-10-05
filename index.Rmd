@@ -1,7 +1,8 @@
 ---
-title: "speed-and-distance"
+title: "title"
 author: "Rance Nault"
 date: "October 5, 2019"
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
