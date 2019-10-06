@@ -12,7 +12,7 @@
 
 
 
-<title>title</title>
+<title>Study Details</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -293,12 +293,73 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">title</h1>
+<h1 class="title toc-ignore">Study Details</h1>
 
 </div>
 
 
-
+<p>Data was collected as part of preliminary method development and testing for single-nuclei RNA-sequencing from mouse livers of 2,3,7,8-tetrachlorodibenzo-p-dioxin (TCDD) treated mice. For experimental and model details see the following publications (pubs). A total of 4 samples (2 vehicle, 2 TCDD) were examined by snRNA-seq. Samples were run in two batches (Day 1 - VEH64; Day 2 - VEH62, TCDD51, TCDD59).</p>
+<div id="environment-variables-and-packages" class="section level1">
+<h1><strong>Environment Variables and Packages</strong></h1>
+<pre class="r"><code># Load librariers and set workind directory
+library(Seurat)</code></pre>
+<pre><code>## Warning: package &#39;Seurat&#39; was built under R version 3.5.3</code></pre>
+<p>Analysis was performed using R version 3.5.2 (2018-12-20), Seurat v3.0.2, dplyr v0.8.3, Cowplot v1.0.0, ggplot v3.2.1, and scales v1.0.0. Aligned reads were generated using CellRanger v3.0.2 and aligned to the mm10-3.0.0_premrna mouse build.</p>
+</div>
+<div id="section-1-data-import-and-preprocessing" class="section level1">
+<h1><em><strong>Section 1:</strong></em> <strong>Data import and preprocessing</strong></h1>
+<div id="importing-cellranger-data" class="section level2">
+<h2><strong>Importing CellRanger data</strong></h2>
+<p><span style="background-color: #dbdbdb">Read10X</span> is used to import individual datasets from CellRanger. Datasets are filtered to include only genes detected in at least <strong>3</strong> nuclei, and nuclei which express at least <strong>100</strong> unique genes (features). Nuclei express fewer genes compared to whole cell, therefore these numbers are lower than some single-cell RNA-sequencing datasets. Cells which possess &gt;= <strong>5%</strong> mitochondrial RNA are excluded from future analyses. Nuclei isolation should result in little to no mitochondrial contamination.</p>
+<pre class="r"><code>cellmin = 3
+featmin = 100
+mtmax = 5
+#VEH62
+VEH62.data &lt;- Read10X(data.dir = &quot;C://Users/Rance/Downloads/NovoG2/VEH62/outs/filtered_feature_bc_matrix/&quot;)
+VEH62 &lt;- CreateSeuratObject(counts = VEH62.data, project = &quot;VEH62&quot;, min.cells = cellmin, min.features = featmin)
+VEH62[[&quot;percent.mt&quot;]] &lt;- PercentageFeatureSet(VEH62, pattern = &quot;^mt-&quot;)
+VEH62$treatment &lt;- &#39;CONTROL&#39;
+VEH62 &lt;- subset(VEH62, subset = percent.mt &lt; mtmax)
+rm(VEH62.data)
+#
+#VEH64
+VEH64.data &lt;- Read10X(data.dir = &quot;C://Users/Rance/Downloads/NovoG2/VEH64/outs/filtered_feature_bc_matrix/&quot;)
+VEH64 &lt;- CreateSeuratObject(counts = VEH64.data, project = &quot;VEH64&quot;, min.cells = cellmin, min.features = featmin) 
+VEH64[[&quot;percent.mt&quot;]] &lt;- PercentageFeatureSet(VEH64, pattern = &quot;^mt-&quot;)
+VEH64$treatment &lt;- &#39;CONTROL&#39;
+VEH64 &lt;- subset(VEH64, subset = percent.mt &lt; mtmax)
+rm(VEH64.data)
+#
+#TCDD51
+TCDD51.data &lt;- Read10X(data.dir = &quot;C://Users/Rance/Downloads/NovoG2/TCDD51/outs/filtered_feature_bc_matrix/&quot;)
+TCDD51 &lt;- CreateSeuratObject(counts = TCDD51.data, project = &quot;TCDD51&quot;, min.cells = cellmin, min.features = featmin) 
+TCDD51[[&quot;percent.mt&quot;]] &lt;- PercentageFeatureSet(TCDD51, pattern = &quot;^mt-&quot;)
+TCDD51$treatment &lt;- &#39;TCDD&#39;
+TCDD51 &lt;- subset(TCDD51, subset = percent.mt &lt; mtmax)
+rm(TCDD51.data)
+#
+#TCDD59
+TCDD59.data &lt;- Read10X(data.dir = &quot;C://Users/Rance/Downloads/NovoG2/TCDD59/outs/filtered_feature_bc_matrix/&quot;)
+TCDD59 &lt;- CreateSeuratObject(counts = TCDD59.data, project = &quot;TCDD59&quot;, min.cells = cellmin, min.features = featmin) 
+TCDD59[[&quot;percent.mt&quot;]] &lt;- PercentageFeatureSet(TCDD59, pattern = &quot;^mt-&quot;)
+TCDD59$treatment &lt;- &#39;TCDD&#39;
+TCDD59 &lt;- subset(TCDD59, subset = percent.mt &lt; mtmax)
+rm(TCDD59.data)</code></pre>
+</div>
+<div id="summarizing-datasets" class="section level2">
+<h2><strong>Summarizing datasets</strong></h2>
+<pre class="r"><code>data.summary &lt;- rbind(dim(VEH62), dim(VEH64), dim(TCDD51), dim(TCDD59))
+row.names(data.summary) &lt;- c(&quot;VEH62&quot;, &quot;VEH64&quot;, &quot;TCDD51&quot;, &quot;TCDD59&quot;)
+colnames(data.summary) &lt;- c(&quot;Number of Genes&quot;, &quot;Number of Nuclei&quot;)</code></pre>
+<p><em><strong>Table 1.</strong></em> Number of genes and nuclei sequenced in liver samples of mice gavaged with sesame oil vehicle or 30 ug/kg TCDD every 4 days for 28 days.</p>
+<pre><code>##        Number of Genes Number of Nuclei
+## VEH62            17575             3403
+## VEH64            17098             6992
+## TCDD51           18402             3044
+## TCDD59           18607             3272</code></pre>
+<p>A total of 16711 (10395 vehicle and 6316 treated) nuclei were transcriptomes were profiled. The average number of genes detected in each sample was 1.7920510^{4} and the median number of unique expressed genes in individual nuclei was 1694 with a median UMI count of with a median UMI count of 3385</p>
+</div>
+</div>
 
 
 
