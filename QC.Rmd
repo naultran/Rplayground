@@ -1,5 +1,5 @@
 ---
-title: "speed-and-distance"
+title: "QC"
 author: "Rance Nault"
 date: "October 5, 2019"
 ---
@@ -10,7 +10,7 @@ __09/27/19__
 Data was collected as part of preliminary method development and testing for single-nuclei RNA-sequencing from mouse livers of 2,3,7,8-tetrachlorodibenzo-p-dioxin (TCDD) treated mice. For experimental and model details see the following publications (pubs). A total of 4 samples (2 vehicle, 2 TCDD) were examined by snRNA-seq. Samples were run in two batches (Day 1 - VEH64; Day 2 - VEH62, TCDD51, TCDD59).
 
 #__Environment Variables and Packages__
-```{r message=FALSE}
+```{r message=FALSE, echo=FALSE}
 # Load librariers and set workind directory
 library(scales)
 library(dplyr)

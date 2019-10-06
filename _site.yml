@@ -7,5 +7,7 @@ navbar:
       href: index.html
     - text: "Speed and Distance"
       href: speed-and-distance.html
+    - text: "QC"
+      href: QC.html
 output:
   html_document:
